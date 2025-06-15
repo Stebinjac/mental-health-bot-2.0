@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Empli - Mental Health Bot</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #81d4fa, #f48fb1); /* Updated gradient */
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    h1 {
+      font-size: 4rem; /* Increased font size */
+      color: #00796b; /* Teal color */
+      margin-top: 20px;
+      text-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      font-size: 2rem; /* Increased tagline font size */
+      color: #004d40; /* Darker teal for tagline */
+      margin-top: 10px;
+      text-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .chat-box {
+      width: 90%;
+      max-width: 800px; /* Increased max width */
+      height: 80vh; /* Increased height */
+      overflow-y: auto;
+      margin-top: 20px;
+      padding: 30px; /* Increased padding */
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      font-size: 1.5rem; /* Increased font size for messages */
+    }
+
+    .message {
+      margin: 15px 0; /* Increased margin */
+      padding: 20px; /* Increased padding */
+      border-radius: 10px;
+      transition: transform 0.2s;
+    }
+
+    .user {
+      background: #b2ebf2; /* Light teal */
+      text-align: right;
+      border-bottom-right-radius: 0; /* Rounded corners */
+    }
+
+    .bot {
+      background: #ffccbc; /* Light peach */
+      text-align: left;
+      border-bottom-left-radius: 0; /* Rounded corners */
+    }
+
+    #input-section {
+      margin-top: 20px;
+      width: 90%;
+      max-width: 800px; /* Increased max width */
+      display: flex;
+      position: relative;
+    }
+
+    #user-input {
+      flex: 1;
+      padding: 20px; /* Increased padding */
+      font-size: 1.5rem; /* Increased font size */
+      border: none;
+      border-radius: 10px 0 0 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      background: rgba(255, 255, 255, 0.8);
+      color: #333;
+    }
+
+    #send-btn {
+      padding: 20px 40px; /* Increased padding */
+      font-size: 1.5rem; /* Increased font size */
+      background: #00796b; /* Teal color */
+      color: #fff;
+      border: none;
+      border-radius: 0 10px 10px 0;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    #send-btn:hover {
+      background: #009688; /* Darker teal on hover */
+      transform: scale(1.05); /* Slightly enlarge on hover */
+    }
+
+    #send-btn:active {
+      transform: scale(0.95); /* Slightly shrink on click */
+    }
+  </style>
+</head>
+<body>
+  <h1>HusH</h1>
+  <h2>"When the world is loud, Hush listens."</h2> <!-- Tagline added here -->
+  <div class="chat-box" id="chat-box"></div>
+  <div id="input-section">
+    <input type="text" id="user-input" placeholder="I am Listening..." />
+    <button id="send-btn">Send</button>
+  </div>
+
+  <script>
+    const chatBox = document.getElementById("chat-box");
+    const userInput = document.getElementById("user-input");
+    const sendBtn = document.getElementById("send-btn");
+    let history = [];
+
+    // Function to handle sending messages
+    const sendMessage = async () => {
+      const text = userInput.value.trim();
+      if (!text) return;
+      addMessage("user", text);
+      history.push({ role: "user", content: text });
+
+      const res = await fetch("http://localhost:3000/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: history })
+      });
+
+      const data = await res.json();
+      addMessage("bot", data.reply);
+      history.push({ role: "assistant", content: data.reply });
+      userInput.value = "";
+    };
+
+    // Send message on button click
+    sendBtn.onclick = sendMessage;
+
+    // Send message on Enter key press
+    userInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault(); // Prevent default action (new line)
+        sendMessage(); // Call sendMessage function
+      }
+    });
+
+    function addMessage(role, content) {
+      const div = document.createElement("div");
+      div.className = `message ${role}`;
+      div.textContent = content;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  </script>
+</body>
+</html>
