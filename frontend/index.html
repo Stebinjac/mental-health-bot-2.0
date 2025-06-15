@@ -127,7 +127,7 @@
       addMessage("user", text);
       history.push({ role: "user", content: text });
 
-      const res = await fetch("http://localhost:3000/chat", {
+      const res = await fetch("https://mental-health-bot-backend.onrender.com", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: history })
