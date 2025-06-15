@@ -13,7 +13,7 @@ app = FastAPI()
 # Allow frontend access
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://mental-health-bot-2-0.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
