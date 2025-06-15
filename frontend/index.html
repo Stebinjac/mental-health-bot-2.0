@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: 'Arial', sans-serif;
-      background: linear-gradient(135deg, #81d4fa, #f48fb1); /* Updated gradient */
+      background: linear-gradient(135deg, #81d4fa, #f48fb1);
       color: #333;
       display: flex;
       flex-direction: column;
@@ -19,63 +19,63 @@
     }
 
     h1 {
-      font-size: 4rem; /* Increased font size */
-      color: #00796b; /* Teal color */
+      font-size: 4rem;
+      color: #00796b;
       margin-top: 20px;
       text-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
     }
 
     h2 {
-      font-size: 2rem; /* Increased tagline font size */
-      color: #004d40; /* Darker teal for tagline */
+      font-size: 2rem;
+      color: #004d40;
       margin-top: 10px;
       text-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
     }
 
     .chat-box {
       width: 90%;
-      max-width: 800px; /* Increased max width */
-      height: 80vh; /* Increased height */
+      max-width: 800px;
+      height: 80vh;
       overflow-y: auto;
       margin-top: 20px;
-      padding: 30px; /* Increased padding */
+      padding: 30px;
       background: rgba(255, 255, 255, 0.9);
       border-radius: 15px;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-      font-size: 1.5rem; /* Increased font size for messages */
+      font-size: 1.5rem;
     }
 
     .message {
-      margin: 15px 0; /* Increased margin */
-      padding: 20px; /* Increased padding */
+      margin: 15px 0;
+      padding: 20px;
       border-radius: 10px;
       transition: transform 0.2s;
     }
 
     .user {
-      background: #b2ebf2; /* Light teal */
+      background: #b2ebf2;
       text-align: right;
-      border-bottom-right-radius: 0; /* Rounded corners */
+      border-bottom-right-radius: 0;
     }
 
     .bot {
-      background: #ffccbc; /* Light peach */
+      background: #ffccbc;
       text-align: left;
-      border-bottom-left-radius: 0; /* Rounded corners */
+      border-bottom-left-radius: 0;
     }
 
     #input-section {
       margin-top: 20px;
       width: 90%;
-      max-width: 800px; /* Increased max width */
+      max-width: 800px;
       display: flex;
       position: relative;
     }
 
     #user-input {
       flex: 1;
-      padding: 20px; /* Increased padding */
-      font-size: 1.5rem; /* Increased font size */
+      padding: 20px;
+      font-size: 1.5rem;
       border: none;
       border-radius: 10px 0 0 10px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -84,9 +84,9 @@
     }
 
     #send-btn {
-      padding: 20px 40px; /* Increased padding */
-      font-size: 1.5rem; /* Increased font size */
-      background: #00796b; /* Teal color */
+      padding: 20px 40px;
+      font-size: 1.5rem;
+      background: #00796b;
       color: #fff;
       border: none;
       border-radius: 0 10px 10px 0;
@@ -96,18 +96,18 @@
     }
 
     #send-btn:hover {
-      background: #009688; /* Darker teal on hover */
-      transform: scale(1.05); /* Slightly enlarge on hover */
+      background: #009688;
+      transform: scale(1.05);
     }
 
     #send-btn:active {
-      transform: scale(0.95); /* Slightly shrink on click */
+      transform: scale(0.95);
     }
   </style>
 </head>
 <body>
   <h1>HusH</h1>
-  <h2>"When the world is loud, Hush listens."</h2> <!-- Tagline added here -->
+  <h2>"When the world is loud, Hush listens."</h2>
   <div class="chat-box" id="chat-box"></div>
   <div id="input-section">
     <input type="text" id="user-input" placeholder="I am Listening..." />
@@ -120,33 +120,40 @@
     const sendBtn = document.getElementById("send-btn");
     let history = [];
 
-    // Function to handle sending messages
     const sendMessage = async () => {
       const text = userInput.value.trim();
       if (!text) return;
+
       addMessage("user", text);
       history.push({ role: "user", content: text });
 
-      const res = await fetch("https://mental-health-bot-2-0.onrender.com", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: history })
-      });
+      try {
+        const res = await fetch("https://mental-health-bot-2-0.onrender.com", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages: history })
+        });
 
-      const data = await res.json();
-      addMessage("bot", data.reply);
-      history.push({ role: "assistant", content: data.reply });
+        const data = await res.json();
+        console.log("API Response:", data); // Debug line
+
+        const botReply = data.reply || data.message || "⚠️ I couldn't understand. Please try again.";
+        addMessage("bot", botReply);
+        history.push({ role: "assistant", content: botReply });
+      } catch (err) {
+        console.error("Error:", err);
+        addMessage("bot", "⚠️ Server error. Please try again later.");
+      }
+
       userInput.value = "";
     };
 
-    // Send message on button click
     sendBtn.onclick = sendMessage;
 
-    // Send message on Enter key press
     userInput.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
-        event.preventDefault(); // Prevent default action (new line)
-        sendMessage(); // Call sendMessage function
+        event.preventDefault();
+        sendMessage();
       }
     });
 
